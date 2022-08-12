@@ -12,3 +12,9 @@ export interface IRepository {
   stars: number;
   forks: number;
 }
+
+export interface IRootState {
+  likedUser: {
+    users: Array<any>;
+  };
+}

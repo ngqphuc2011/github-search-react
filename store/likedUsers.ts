@@ -3,7 +3,6 @@ import { createSlice } from '@reduxjs/toolkit';
 
 const initialState = {
   users: [] as any,
-  totalCount: 0,
 };
 
 const likedUserSlice = createSlice({

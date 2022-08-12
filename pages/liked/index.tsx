@@ -4,6 +4,7 @@ import { useDispatch, useSelector } from 'react-redux';
 import UserList from '../../components/UserList';
 import { likedUserActions } from '../../store';
 import { useEffect } from 'react';
+import { IRootState } from '../../types';
 
 const StyledInitialFavoritePage = styled.div`
   display: flex;
@@ -31,7 +32,9 @@ const StyledFavoritePage = styled.div`
 
 const LikedPage: React.FC = () => {
   const dispatch = useDispatch();
-  const likedUsersList = useSelector((state: any) => state.likedUser.users);
+  const likedUsersList = useSelector(
+    (state: IRootState) => state.likedUser.users
+  );
 
   useEffect(() => {
     dispatch(likedUserActions.fetchLikedUser());

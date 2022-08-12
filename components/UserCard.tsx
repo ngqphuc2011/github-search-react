@@ -3,7 +3,7 @@ import { Card, Box, Avatar } from '@mui/material';
 import styled from 'styled-components';
 import { useRouter } from 'next/router';
 import { Fragment, SyntheticEvent } from 'react';
-import { IUser } from '../types';
+import { IRootState, IUser } from '../types';
 import { useDispatch, useSelector } from 'react-redux';
 import { likedUserActions } from '../store';
 import { formatNumber } from '../utils/format-number';
@@ -24,7 +24,7 @@ const StyledSecondaryText = styled.div`
 `;
 const UserCard: React.FC<{ user: IUser; searchText?: string }> = (props) => {
   const router = useRouter();
-  const likedUsers = useSelector((state: any) => state.likedUser.users);
+  const likedUsers = useSelector((state: IRootState) => state.likedUser.users);
   const dispatch = useDispatch();
 
   const clickCardHandler = () => {
