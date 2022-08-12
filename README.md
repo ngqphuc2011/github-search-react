@@ -18,7 +18,7 @@ Step 4: Open [http://localhost:3000](http://localhost:3000) with your browser to
 - React
 - NextJS
 - Redux & redux-toolkit
-- lodash
+- styled-components
 - MUI
 
 ## Public deployment of the latest version:
