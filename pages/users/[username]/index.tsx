@@ -7,6 +7,7 @@ import { TabPanel, TabContext, TabList } from '@mui/lab';
 import RepositoryList from '../../../components/RepositoryList';
 import UserList from '../../../components/UserList';
 import { formatNumber } from '../../../utils/format-number';
+import { get } from '../../../utils/http-fetch';
 
 const StyledUserDataName = styled.div`
   font-family: 'Arsenal';
@@ -69,11 +70,7 @@ const UsersPage: React.FC = () => {
         const searchUrl = new URL(
           `https://api.github.com/users/${router.query.username}`
         );
-        const response = await fetch(searchUrl, {
-          headers: {
-            Authorization: process.env.NEXT_PUBLIC_TOKEN || '',
-          },
-        });
+        const response = await get(searchUrl);
         const responseData = await response.json();
         const processedUserData = {
           avatar: responseData.avatar_url,
@@ -98,21 +95,19 @@ const UsersPage: React.FC = () => {
       );
       searchUrl.searchParams.append('page', `${repositoriesPage}`);
       searchUrl.searchParams.append('per_page', '12');
-      const response = await fetch(searchUrl, {
-        headers: {
-          Authorization: process.env.NEXT_PUBLIC_TOKEN || '',
-        },
-      });
+      const response = await get(searchUrl);
       const responseData = await response.json();
-      const processedUserRepos = responseData.map((repo: any) => {
-        return {
-          id: repo.id,
-          name: repo.name,
-          forks: repo.forks_count,
-          stars: repo.stargazers_count,
-        };
-      });
-      setRepositoriesList(processedUserRepos);
+      if (Array.isArray(responseData)) {
+        const processedUserRepos = responseData.map((repo: any) => {
+          return {
+            id: repo.id,
+            name: repo.name,
+            forks: repo.forks_count,
+            stars: repo.stargazers_count,
+          };
+        });
+        setRepositoriesList(processedUserRepos);
+      }
     };
     fetchUserRepos().finally(() => {
       setIsLoading(false);
@@ -127,30 +122,26 @@ const UsersPage: React.FC = () => {
       );
       searchUrl.searchParams.append('page', `${followersPage}`);
       searchUrl.searchParams.append('per_page', '12');
-      const response = await fetch(searchUrl, {
-        headers: {
-          Authorization: process.env.NEXT_PUBLIC_TOKEN || '',
-        },
-      });
+      const response = await get(searchUrl);
       const responseData = await response.json();
-      const promiseItems = responseData.map(async (item: any) => {
-        const detailUrl = new URL(`https://api.github.com/users/${item.login}`);
-        const detailResponse = await fetch(detailUrl, {
-          headers: {
-            Authorization: process.env.NEXT_PUBLIC_TOKEN || '',
-          },
+      if (Array.isArray(responseData)) {
+        const promiseItems = responseData.map(async (item: any) => {
+          const detailUrl = new URL(
+            `https://api.github.com/users/${item.login}`
+          );
+          const detailResponse = await get(detailUrl);
+          const detailResponseData = await detailResponse.json();
+          return {
+            avatar: item.avatar_url,
+            id: item.id,
+            username: item.login,
+            followers: detailResponseData.followers,
+            following: detailResponseData.following,
+          };
         });
-        const detailResponseData = await detailResponse.json();
-        return {
-          avatar: item.avatar_url,
-          id: item.id,
-          username: item.login,
-          followers: detailResponseData.followers,
-          following: detailResponseData.following,
-        };
-      });
-      const processedUserFollowers = await Promise.all(promiseItems);
-      setFollowersList(processedUserFollowers);
+        const processedUserFollowers = await Promise.all(promiseItems);
+        setFollowersList(processedUserFollowers);
+      }
     };
     fetchUserFollowers().finally(() => {
       setIsLoading(false);
@@ -165,30 +156,26 @@ const UsersPage: React.FC = () => {
       );
       searchUrl.searchParams.append('page', `${followingPage}`);
       searchUrl.searchParams.append('per_page', '12');
-      const response = await fetch(searchUrl, {
-        headers: {
-          Authorization: process.env.NEXT_PUBLIC_TOKEN || '',
-        },
-      });
+      const response = await get(searchUrl);
       const responseData = await response.json();
-      const promiseItems = responseData.map(async (item: any) => {
-        const detailUrl = new URL(`https://api.github.com/users/${item.login}`);
-        const detailResponse = await fetch(detailUrl, {
-          headers: {
-            Authorization: process.env.NEXT_PUBLIC_TOKEN || '',
-          },
+      if (Array.isArray(responseData)) {
+        const promiseItems = responseData.map(async (item: any) => {
+          const detailUrl = new URL(
+            `https://api.github.com/users/${item.login}`
+          );
+          const detailResponse = await get(detailUrl);
+          const detailResponseData = await detailResponse.json();
+          return {
+            avatar: item.avatar_url,
+            id: item.id,
+            username: item.login,
+            followers: detailResponseData.followers,
+            following: detailResponseData.following,
+          };
         });
-        const detailResponseData = await detailResponse.json();
-        return {
-          avatar: item.avatar_url,
-          id: item.id,
-          username: item.login,
-          followers: detailResponseData.followers,
-          following: detailResponseData.following,
-        };
-      });
-      const processedUserFollowing = await Promise.all(promiseItems);
-      setFollowingList(processedUserFollowing);
+        const processedUserFollowing = await Promise.all(promiseItems);
+        setFollowingList(processedUserFollowing);
+      }
     };
     fetchUserFollowings().finally(() => {
       setIsLoading(false);

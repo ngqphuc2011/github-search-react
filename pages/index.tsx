@@ -5,6 +5,7 @@ import { GitHub, Search } from '@mui/icons-material';
 import UserCard from '../components/UserCard';
 import { IUser } from '../types';
 import { useRouter } from 'next/router';
+import { get } from '../utils/http-fetch';
 
 const StyledInitialSearchPage = styled.div`
   display: flex;
@@ -82,35 +83,28 @@ const Home: React.FC = () => {
         searchUrl.searchParams.append('page', `${page}`);
         searchUrl.searchParams.append('per_page', '12');
 
-        const response = await fetch(searchUrl, {
-          headers: {
-            Authorization: process.env.NEXT_PUBLIC_TOKEN || '',
-          },
-        });
+        const response = await get(searchUrl);
         const responseData = await response.json();
         const processedTotalCount = responseData.total_count;
-        const promiseItems = responseData.items?.map(async (item: any) => {
-          const detailUrl = new URL(
-            `https://api.github.com/users/${item.login}`
-          );
-          const detailResponse = await fetch(detailUrl, {
-            headers: {
-              Authorization: process.env.NEXT_PUBLIC_TOKEN || '',
-            },
-          });
-          const detailResponseData = await detailResponse.json();
-          return {
-            avatar: item.avatar_url,
-            id: item.id,
-            username: item.login,
-            followers: detailResponseData.followers,
-            following: detailResponseData.following,
-          };
-        });
-        const processedItems = await Promise.all(promiseItems);
-
         setTotalCount(processedTotalCount);
-        setUsersList(processedItems || []);
+        if (Array.isArray(responseData.items)) {
+          const promiseItems = responseData.items.map(async (item: any) => {
+            const detailUrl = new URL(
+              `https://api.github.com/users/${item.login}`
+            );
+            const detailResponse = await get(detailUrl)
+            const detailResponseData = await detailResponse.json();
+            return {
+              avatar: item.avatar_url,
+              id: item.id,
+              username: item.login,
+              followers: detailResponseData.followers,
+              following: detailResponseData.following,
+            };
+          });
+          const processedItems = await Promise.all(promiseItems);
+          setUsersList(processedItems || []);
+        }
       }
     };
     const fetchUserHandler = setTimeout(async () => {
