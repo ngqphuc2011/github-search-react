@@ -132,7 +132,7 @@ const Home: React.FC = () => {
   }, [router.query.q]);
 
   const changeSearchTextHandler = (event: ChangeEvent<HTMLInputElement>) => {
-    router.push({
+    router.replace({
       query: { q: event.target.value },
     });
     setSearchText(event.target.value);
