@@ -50,8 +50,8 @@ const UserCard: React.FC<{ user: IUser; searchText?: string }> = (props) => {
   };
   const processedUsername = props.searchText ? (
     <Fragment>
-      <StyledHighlightedText>{props.searchText}</StyledHighlightedText>
-      {props.user.username.split(props.searchText)}
+      <StyledHighlightedText>{props.searchText.toLowerCase()}</StyledHighlightedText>
+      {props.user.username.split(props.searchText.toLowerCase())}
     </Fragment>
   ) : (
     props.user.username
